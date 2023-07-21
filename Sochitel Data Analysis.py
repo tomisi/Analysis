@@ -33,6 +33,20 @@ df = pd.read_excel(file_path)
 df.head()
 
 
+# In[119]:
+
+
+duplicates = df.duplicated()
+
+
+# In[121]:
+
+
+duplicated_rows = df[duplicates]
+print("Duplicated Rows:")
+print(duplicated_rows)
+
+
 # In[10]:
 
 
@@ -268,40 +282,182 @@ pd.set_option('display.max_columns', None)
 display(revenue_breakdown)
 
 
-# In[80]:
+# In[107]:
 
 
-product_revenue = df.groupby('Product Name')['Buy Margin (£)'].sum().reset_index()
+product_revenue = df.groupby('Product Type')['Buy Margin (£)'].sum().reset_index()
 
 
-# In[81]:
+# In[108]:
 
 
 least_performing_products = product_revenue.sort_values(by='Buy Margin (£)', ascending=True)
 
 
-# In[82]:
+# In[109]:
 
 
 top_10_least_performing_products = least_performing_products.head(10)
 
 
-# In[83]:
+# In[110]:
 
 
 print("Top 10 Least Performing Products:")
 print(least_performing_products)
 
 
-# In[85]:
+# In[112]:
 
 
 plt.figure(figsize=(12, 6))
-plt.bar(top_10_least_performing_products['Product Name'], top_10_least_performing_products['Buy Margin (£)'], color='Orange')
+plt.bar(top_10_least_performing_products['Product Type'], top_10_least_performing_products['Buy Margin (£)'], color='Orange')
 plt.title('Top 10 Least Performing Products')
 plt.xlabel('Product Name')
 plt.ylabel('Buy Margin (£)')
 plt.xticks(rotation=45, ha='right')
+plt.tight_layout()
+plt.show()
+
+
+# In[91]:
+
+
+operator_supplier_count = df.groupby('Operator')['Suppier Name'].nunique().reset_index()
+
+
+# In[92]:
+
+
+print(operator_supplier_count)
+
+
+# In[93]:
+
+
+total_revenue_generated = df['Buy Margin (£)'].sum()
+
+print("Total Revenue Generated: £{:.2f}".format(total_revenue_generated))
+
+
+# In[94]:
+
+
+client_revenue = df.groupby('Beneficial User')['Buy Margin (£)'].sum().reset_index()
+
+
+# In[95]:
+
+
+sorted_client_revenue = client_revenue.sort_values(by='Buy Margin (£)', ascending=False)
+
+
+# In[96]:
+
+
+top_7_clients = sorted_client_revenue.head(7)
+
+print(top_7_clients)
+
+
+# In[102]:
+
+
+df['Profit'] = df['Buy Margin (£)']
+
+
+# In[103]:
+
+
+revenue_breakdown = df.groupby([ 'Continent' ])['Profit'].sum().reset_index()
+
+
+# In[104]:
+
+
+revenue_breakdown = revenue_breakdown.sort_values(by='Profit', ascending=False)
+
+
+# In[105]:
+
+
+print(revenue_breakdown)
+
+
+# In[106]:
+
+
+product_revenue = df.groupby('Product Type')['Buy Margin (£)'].sum().reset_index()
+
+
+# In[113]:
+
+
+
+print(product_revenue)
+
+
+# In[114]:
+
+
+average_buy_margin = product_revenue['Buy Margin (£)'].mean()
+
+
+# In[115]:
+
+
+most_profitable_products = product_revenue[product_revenue['Buy Margin (£)'] >= average_buy_margin]
+
+
+# In[116]:
+
+
+improvement_needed_products = product_revenue[product_revenue['Buy Margin (£)'] < average_buy_margin]
+
+
+# In[117]:
+
+
+print("Most Profitable Products:")
+print(most_profitable_products)
+
+
+# In[118]:
+
+
+print("\nProducts Needing Improvement:")
+print(improvement_needed_products)
+
+
+# In[124]:
+
+
+revenue_by_currency = df.groupby('Operator Currency')['Buy Margin (£)'].sum().reset_index()
+print(revenue_by_currency)
+
+
+# In[127]:
+
+
+revenue_by_currency = df.groupby('Operator Currency')['Buy Margin (£)'].sum().reset_index()
+top_10_currencies = revenue_by_currency.sort_values('Buy Margin (£)', ascending=False).head(10)
+
+
+# In[133]:
+
+
+plt.figure(figsize=(10, 6))
+bars = plt.bar(top_10_currencies['Operator Currency'], top_10_currencies['Buy Margin (£)'], color='orange')
+plt.xlabel('Operator Currency')
+plt.ylabel('Revenue (£)')
+plt.title('Top 10 Currencies by Revenue')
+plt.xticks(rotation=45, ha='right', fontsize=10)
+plt.yticks(fontsize=10)
+for bar in bars:
+    height = bar.get_height()
+    plt.annotate(f'{height:.2f}', xy=(bar.get_x() + bar.get_width() / 2, height),
+                 xytext=(0, 3), textcoords="offset points", ha='center', va='bottom', fontsize=9)
+
 plt.tight_layout()
 plt.show()
 
